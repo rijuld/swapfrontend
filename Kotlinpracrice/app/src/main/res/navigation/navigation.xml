@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/titlefragment">
+
+    <fragment
+        android:id="@+id/titlefragment"
+        android:name="com.example.kotlinpracrice.titlefragment"
+        android:label="fragment_titlefragment"
+        tools:layout="@layout/fragment_titlefragment" >
+        <action
+            android:id="@+id/action_titlefragment_to_page22"
+            app:destination="@id/page22" />
+    </fragment>
+    <fragment
+        android:id="@+id/page22"
+        android:name="com.example.kotlinpracrice.page2"
+        android:label="fragment_page2"
+        tools:layout="@layout/fragment_page2" >
+        <action
+            android:id="@+id/action_page22_to_page32"
+            app:destination="@id/page32" />
+    </fragment>
+    <fragment
+        android:id="@+id/page32"
+        android:name="com.example.kotlinpracrice.page3"
+        android:label="fragment_page3"
+        tools:layout="@layout/fragment_page3" >
+        <action
+            android:id="@+id/action_page32_to_page42"
+            app:destination="@id/page42" />
+    </fragment>
+    <fragment
+        android:id="@+id/page42"
+        android:name="com.example.kotlinpracrice.page4"
+        android:label="fragment_page4"
+        tools:layout="@layout/fragment_page4" >
+        <action
+            android:id="@+id/action_page42_to_page22"
+            app:destination="@id/page22" />
+        <action
+            android:id="@+id/action_page42_to_titlefragment"
+            app:destination="@id/titlefragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/page53"
+        android:name="com.example.kotlinpracrice.page5"
+        android:label="fragment_page5"
+        tools:layout="@layout/fragment_page5" >
+        <action
+            android:id="@+id/action_page53_to_phonenumber"
+            app:destination="@id/phonenumber" />
+    </fragment>
+    <fragment
+        android:id="@+id/phonenumber"
+        android:name="com.example.kotlinpracrice.Phonenumber"
+        android:label="fragment_phonenumber"
+        tools:layout="@layout/fragment_phonenumber" >
+        <action
+            android:id="@+id/action_phonenumber_to_titlefragment"
+            app:destination="@id/titlefragment" />
+    </fragment>
+</navigation>
