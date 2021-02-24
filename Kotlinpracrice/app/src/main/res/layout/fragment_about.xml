@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".about">
+
+    <TextView
+        android:id="@+id/abouttext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:padding="5dp"
+        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum commodo, mi eget suscipit porta, ligula risus ultricies mauris, non ultrices nisl turpis sed leo. Aenean malesuada imperdiet quam ut euismod. Integer vitae diam et mauris tincidunt fermentum. Fusce posuere id massa sit amet tristique. Cras nunc dolor, molestie nec sagittis varius, semper nec magna. Duis sed dapibus justo. Suspendisse potenti. Sed libero diam, cursus et velit at, elementum porta justo. Suspendisse in ullamcorper nulla."
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/abouttitle"
+        app:layout_constraintVertical_bias="0.12"
+        tools:layout_editor_absoluteX="1dp" />
+
+    <TextView
+        android:id="@+id/abouttitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="How to use the app?"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

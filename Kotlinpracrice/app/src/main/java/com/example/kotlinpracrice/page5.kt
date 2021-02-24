@@ -1,59 +1,155 @@
 package com.example.kotlinpracrice
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import com.example.kotlinpracrice.databinding.FragmentPage5Binding
+import com.example.kotlinpracrice.repository.Repository
+import com.example.kotlinpracrice.viewmodelfactory.page3viewmodelfactory
+import com.example.kotlinpracrice.viewmodels.page3viewmodel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import okio.IOException
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [page5.newInstance] factory method to
- * create an instance of this fragment.
- */
 class page5 : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var binding: FragmentPage5Binding
+    private var navController: NavController? = null
+    private lateinit var viewModel: page3viewmodel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+
+    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        binding= DataBindingUtil.inflate(inflater, R.layout.fragment_page5, container, false)
+        Log.i("page5Fragment", "Called page5 ViewModel.of")
+        val repository= Repository()
+        val viewModelFactory= page3viewmodelfactory(repository)
+        viewModel= ViewModelProviders.of(this, viewModelFactory).get(page3viewmodel::class.java)
+
+        binding.buttonpage5.setOnClickListener { view: View->
+            signIn();
         }
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("75980394763-bj0hr3nhh40qk6qaoeh6ddi4p0svhfa0.apps.googleusercontent.com")
+            .requestEmail()
+            .build()
+        mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
+
+        return binding.root
+
+    }
+    private fun signIn() {
+        val signInIntent = mGoogleSignInClient.signInIntent
+        startActivityForResult(
+                signInIntent, RC_SIGN_IN
+        )
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_page5, container, false)
+    override fun onStart() {
+        super.onStart()
+        val account = GoogleSignIn.getLastSignedInAccount(requireActivity())
+        if (account != null) {
+            updateUI(account)
+        }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_SIGN_IN) {
+            val task =
+                    GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleSignInResult(task)
+        }
+    }
+    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+        try {
+            val account = completedTask.getResult(
+                    ApiException::class.java
+            )
+
+            // Signed in successfully
+            val googleId = account?.id ?: ""
+            Log.i("Google ID",googleId)
+
+            val googleFirstName = account?.givenName ?: ""
+            Log.i("Google First Name", googleFirstName)
+
+            val googleLastName = account?.familyName ?: ""
+            Log.i("Google Last Name", googleLastName)
+
+            val googleEmail = account?.email ?: ""
+            Log.i("Google Email", googleEmail)
+
+            val googleProfilePicURL = account?.photoUrl.toString()
+            Log.i("Google Profile Pic URL", googleProfilePicURL)
+
+            val googleIdToken = account?.idToken ?: ""
+            Log.i("Google ID Token", googleIdToken)
+            navController = view?.let { Navigation.findNavController(it) }
+            navController!!.navigate(R.id.action_page53_to_phonenumber)
+
+        } catch (e: ApiException) {
+            // Sign in was unsuccessful
+            Log.e(
+                    "failed code=", e.statusCode.toString()
+            )
+        }
+    }
+    private fun signOut() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(requireActivity()) {
+                    // Update your UI here
+                }
+    }
+    private fun revokeAccess() {
+        mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener(requireActivity()) {
+                    // Update your UI here
+                }
+    }
+    private fun updateUI(account: GoogleSignInAccount?)
+    {
+        val idToken = account!!.idToken
+        val acct = GoogleSignIn.getLastSignedInAccount(activity)
+        if (acct != null) {
+            Log.d("Response", acct.displayName.toString())
+            val personName = acct.displayName
+            val personGivenName = acct.givenName
+            val personFamilyName = acct.familyName
+            val personEmail = acct.email
+            val personId = acct.id
+            val personPhoto: Uri? = acct.photoUrl
+        }
+        view?.findNavController()?.navigate(page5Directions.actionPage53ToPhonenumber())
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment page5.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            page5().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        private const val TAG = "GoogleActivity"
+        private const val RC_SIGN_IN = 9001
     }
+
+
+
 }
+//You can also get the user's email address with getEmail, the user's Google ID (for client-side use) with getId, and an ID token for the user with getIdToken. If you need to pass the currently signed-in user to a backend server, send the ID token to your backend server and validate the token on the server.

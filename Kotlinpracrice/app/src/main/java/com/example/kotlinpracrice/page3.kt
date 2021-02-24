@@ -1,59 +1,87 @@
 package com.example.kotlinpracrice
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.findNavController
+import com.example.kotlinpracrice.databinding.FragmentPage3Binding
+import com.example.kotlinpracrice.model.Post
+import com.example.kotlinpracrice.repository.Repository
+import com.example.kotlinpracrice.viewmodelfactory.page3viewmodelfactory
+import com.example.kotlinpracrice.viewmodels.page3viewmodel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [page3.newInstance] factory method to
- * create an instance of this fragment.
- */
 class page3 : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var viewModel: page3viewmodel
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        val binding: FragmentPage3Binding = DataBindingUtil.inflate(inflater, R.layout.fragment_page3, container, false)
+        Log.i("page3Fragment","Called page3 ViewModel.of")
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_page3, container, false)
-    }
+        val repository=Repository()
+        val viewModelFactory=page3viewmodelfactory(repository)
+        Log.d("Response","problem not here")
+        viewModel= ViewModelProviders.of(this,viewModelFactory).get(page3viewmodel::class.java)
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment page3.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            page3().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+        viewModel.customPost(2,"id","desc")
+        val hashMap:HashMap<String,Int> = HashMap<String,Int>()
+        hashMap["HSS F325"] = 12
+        hashMap["HSS F237"] = 5
+        hashMap["HSS F244"] = 6
+        hashMap["HSS F255"] = 7
+        hashMap["HSS F317"] = 10
+        hashMap["HSS F248"] = 8
+        hashMap["HSS F235"] = 3
+        hashMap["HSS F322"] = 11
+        hashMap["HSS F236"] = 4
+
+        viewModel.myCustomPosts.observe(this, Observer { response->
+            if(response.isSuccessful){
+                Log.i("response",response.body().toString())
+               response.body()?.forEach{
+
+                    Log.i("response",it.id.toString())
+                    Log.i("response",it.coursegiv.toString())
+                    Log.i("response",it.coursereq.toString())
+                   Log.i("response",it.user.toString())
                 }
+
             }
+            else{
+                Log.d("Response",response.errorBody().toString())
+            }
+
+
+        })
+        //parameters are the owner and the second view model factory
+        binding.buttonpage3.setOnClickListener { view :View->
+            val have=binding.havetype.text.toString().trim()
+            val want=binding.wanttype.text.toString().trim()
+            val mypost= Post(0, have, want,"rijul2")
+            Log.i("Responsehello",mypost.toString())
+            viewModel.pushPost(mypost)
+            viewModel.postPosts.observe(this, Observer { response->
+                if(response.isSuccessful){
+                    Log.i("Responsefinal",response.body().toString())
+                    view.findNavController().navigate(page3Directions.actionPage32ToPage42())
+                }
+                else{
+                    //Log.i("Responsefinal",response.errorBody().toString())
+                    //view.findNavController().navigate(page3Directions.actionPage32ToPage42())
+                }
+
+
+            })
+
+        }
+        return binding.root
     }
+
+
 }

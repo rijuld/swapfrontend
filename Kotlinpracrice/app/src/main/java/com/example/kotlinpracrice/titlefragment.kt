@@ -1,66 +1,50 @@
 package com.example.kotlinpracrice
 
 import android.os.Bundle
+import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.navigation.Navigation
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
+import androidx.navigation.ui.NavigationUI
 import com.example.kotlinpracrice.databinding.FragmentTitlefragmentBinding
+import com.example.kotlinpracrice.viewmodels.titleviewmodel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.firebase.auth.FirebaseAuth
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [titlefragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class titlefragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-             param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
-    //Inflating and Returning the View with DataBindingUtil
+    private lateinit var viewModel: titleviewmodel
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val binding:FragmentTitlefragmentBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_titlefragment, container, false)
+        Log.i("TitleFragment","Called Title ViewModel.of")
+        val account = GoogleSignIn.getLastSignedInAccount(requireActivity())
+        val idToken= account?.idToken
+        val phonenumber= auth.currentUser?.phoneNumber
+        Log.i("TitleFragment",idToken.toString())
+        viewModel=ViewModelProviders.of(this).get(titleviewmodel::class.java)
         binding.button3.setOnClickListener { view :View->
-            Navigation.findNavController(view).navigate(R.id.action_titlefragment_to_page22 )
+
+            view.findNavController().navigate(titlefragmentDirections.actionTitlefragmentToPage32())
         }
+
+        setHasOptionsMenu(true)
           return binding.root
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.overflow_menu,menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return NavigationUI.onNavDestinationSelected(item!!,view!!.findNavController()) ||super.onOptionsItemSelected(item)
+    }
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment titlefragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            titlefragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+
     }
 }

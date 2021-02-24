@@ -1,59 +1,83 @@
 package com.example.kotlinpracrice
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.kotlinpracrice.adapter.MyAdapter
+import com.example.kotlinpracrice.databinding.FragmentPage4Binding
+import com.example.kotlinpracrice.model.Post
+import com.example.kotlinpracrice.repository.Repository
+import com.example.kotlinpracrice.viewmodelfactory.page3viewmodelfactory
+import com.example.kotlinpracrice.viewmodels.page3viewmodel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [page4.newInstance] factory method to
- * create an instance of this fragment.
- */
-class page4 : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+class page4 : Fragment(),MyAdapter.OnItemClickListener {
+    private lateinit var viewModel: page3viewmodel
+    private  val myAdapter = MyAdapter(this)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+       val binding: FragmentPage4Binding = DataBindingUtil.inflate(inflater, R.layout.fragment_page4, container, false)
+        Log.i("page4Fragment","Called page4 ViewModel.of")
+        val repository=Repository()
+        val viewModelFactory=page3viewmodelfactory(repository)
+        viewModel= ViewModelProviders.of(this,viewModelFactory).get(page3viewmodel::class.java)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_page4, container, false)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment page4.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            page4().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+        viewModel.customPost(2,"id","desc")
+        viewModel.myCustomPosts.observe(this, Observer { response->
+            if(response.isSuccessful){
+                Log.d("Response",response.body().toString())
+                response.body()?.let { myAdapter.setData(it) }
             }
+            else{
+                Log.i("Response",response.errorBody().toString())
+            }
+
+
+        })
+        setupRecyclerview(binding)
+        binding.buttonpage4.setOnClickListener { view :View->
+            view.findNavController().navigate(page4Directions.actionPage42ToPage32())
+        }
+        Log.d("Response","problem not here")
+
+            binding.button41.setOnClickListener { view :View->
+            view.findNavController().navigate(page4Directions.actionPage42ToTitlefragment())
+        }
+        return binding.root
     }
+
+    private fun setupRecyclerview(binding: FragmentPage4Binding) {
+         binding.rrr.adapter=myAdapter
+         binding.rrr.layoutManager=LinearLayoutManager(requireActivity())
+    }
+
+    override fun onItemClick(position: TextView, position1: Int) {
+        Toast.makeText(requireActivity(), position.text.toString(), Toast.LENGTH_SHORT).show()
+        myAdapter.notifyItemChanged(position1)
+        val t=position.text.toString().trim().toInt()
+        viewModel.deletePost(t)
+        viewModel.deleteResponse.observe(this, Observer { response->
+
+            if(response.isSuccessful){
+                Log.i("Response",response.body().toString())
+            }
+            else{
+                Log.i("Response",response.errorBody().toString())
+            }
+
+
+        })
+    }
+
 }

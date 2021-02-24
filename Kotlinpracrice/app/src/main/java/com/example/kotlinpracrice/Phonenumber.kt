@@ -1,59 +1,274 @@
 package com.example.kotlinpracrice
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import com.example.kotlinpracrice.databinding.FragmentPhonenumberBinding
+import com.example.kotlinpracrice.repository.Repository
+import com.example.kotlinpracrice.viewmodelfactory.page3viewmodelfactory
+import com.example.kotlinpracrice.viewmodels.Phonenumberviewmodel
+import com.example.kotlinpracrice.viewmodels.page3viewmodel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.FirebaseException
+import com.google.firebase.FirebaseTooManyRequestsException
+import com.google.firebase.auth.*
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import java.util.concurrent.TimeUnit
+private var navController: NavController? = null
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [Phonenumber.newInstance] factory method to
- * create an instance of this fragment.
- */
 class Phonenumber : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var viewModel: page3viewmodel
+    private lateinit var binding:FragmentPhonenumberBinding
+    private lateinit var auth: FirebaseAuth
+    private var verificationInProgress = false
+    private var storedVerificationId: String? = ""
+    private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
+    private lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_phonenumber, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_phonenumber, container, false)
+        Log.i("PhonenumberFragment", "Called Phonenumber ViewModel.of")
+        val repository= Repository()
+        val viewModelFactory= page3viewmodelfactory(repository)
+        Log.d("Response","problem not here")
+        viewModel= ViewModelProviders.of(this,viewModelFactory).get(page3viewmodel::class.java)
+        binding.buttonphone.setOnClickListener { view: View->
+            val code = binding.verificationno.text.toString()
+            if (TextUtils.isEmpty(code)) {
+                binding.verificationno.error = "Cannot be empty."
+            }
+            verifyPhoneNumberWithCode(storedVerificationId, code)
+        }
+        binding.getcode.setOnClickListener { view: View->
+            if (!validatePhoneNumber()) {
+            }
+            startPhoneNumberVerification(binding.editTextPhone.text.toString())
+        }
+        auth = Firebase.auth
+
+        callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+
+            override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+                val account = GoogleSignIn.getLastSignedInAccount(requireActivity())
+                val idToken= account?.idToken
+                val phonenumber= auth.currentUser?.phoneNumber
+                viewModel.userpost(idToken.toString(),phonenumber.toString())
+                Log.d(TAG, "onVerificationCompleted:$credential")
+                verificationInProgress = false
+                updateUI(STATE_VERIFY_SUCCESS, credential)
+                signInWithPhoneAuthCredential(credential)
+            }
+
+            override fun onVerificationFailed(e: FirebaseException) {
+                Log.w(TAG, "onVerificationFailed", e)
+                verificationInProgress = false
+
+                if (e is FirebaseAuthInvalidCredentialsException) {
+                    binding.editTextPhone.error = "Invalid phone number."
+                } else if (e is FirebaseTooManyRequestsException) {
+                    Log.i("message","QUOTA EXCEEDED")
+                }
+                updateUI(STATE_VERIFY_FAILED)
+            }
+
+            override fun onCodeSent(
+                verificationId: String,
+                token: PhoneAuthProvider.ForceResendingToken
+            ) {
+
+                storedVerificationId = verificationId
+                resendToken = token
+                updateUI(STATE_CODE_SENT)
+            }
+        }
+
+
+        return binding.root
+    }
+    override fun onStart() {
+        super.onStart()
+        val currentUser = auth.currentUser
+        updateUI(currentUser)
+        if (verificationInProgress && validatePhoneNumber()) {
+            startPhoneNumberVerification(binding.editTextPhone.text.toString())
+        }
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_VERIFY_IN_PROGRESS, verificationInProgress)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Phonenumber.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            Phonenumber().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun startPhoneNumberVerification(phoneNumber: String) {
+        val options = PhoneAuthOptions.newBuilder(auth)
+            .setPhoneNumber(phoneNumber)
+            .setTimeout(60L, TimeUnit.SECONDS)
+            .setActivity(requireActivity())
+            .setCallbacks(callbacks)
+            .build()
+        PhoneAuthProvider.verifyPhoneNumber(options)
+        verificationInProgress = true
+    }
+
+    private fun verifyPhoneNumberWithCode(verificationId: String?, code: String) {
+        val credential = PhoneAuthProvider.getCredential(verificationId!!, code)
+        signInWithPhoneAuthCredential(credential)
+    }
+    private fun resendVerificationCode(
+        phoneNumber: String,
+        token: PhoneAuthProvider.ForceResendingToken?
+    ) {
+        val optionsBuilder = PhoneAuthOptions.newBuilder(auth)
+            .setPhoneNumber(phoneNumber)
+            .setTimeout(60L, TimeUnit.SECONDS)
+            .setActivity(requireActivity())
+            .setCallbacks(callbacks)
+        if (token != null) {
+            optionsBuilder.setForceResendingToken(token)
+        }
+        PhoneAuthProvider.verifyPhoneNumber(optionsBuilder.build())
+    }
+    private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    Log.d(TAG, "signInWithCredential:success")
+
+                    val user = task.result?.user
+                    updateUI(STATE_SIGNIN_SUCCESS, user)
+                } else {
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                        binding.editTextPhone.error = "Invalid code."
+                    }
+                    updateUI(STATE_SIGNIN_FAILED)
                 }
             }
     }
+
+    private fun updateUI(user: FirebaseUser?) {
+        if (user != null) {
+            updateUI(STATE_SIGNIN_SUCCESS, user)
+        } else {
+            updateUI(STATE_INITIALIZED)
+        }
+    }
+
+    private fun updateUI(uiState: Int, cred: PhoneAuthCredential) {
+        updateUI(uiState, null, cred)
+    }
+
+    private fun updateUI(
+        uiState: Int,
+        user: FirebaseUser? = auth.currentUser,
+        cred: PhoneAuthCredential? = null
+    ) {
+        when (uiState) {
+            STATE_INITIALIZED -> {
+                binding.getcode.visibility=View.VISIBLE
+                binding.editTextPhone.visibility=View.VISIBLE
+                binding.buttonphone.visibility=View.INVISIBLE
+                binding.buttonphone.visibility=View.INVISIBLE
+                binding.verificationno.visibility=View.INVISIBLE
+                binding.detail.text = null
+            }
+            STATE_CODE_SENT -> {
+                binding.buttonphone.visibility=View.VISIBLE
+                binding.buttonphone.visibility=View.VISIBLE
+                binding.editTextPhone.visibility=View.VISIBLE
+                binding.verificationno.visibility=View.VISIBLE
+                binding.getcode.visibility=View.INVISIBLE
+                Log.i("response","status_code_sent")
+
+            }
+            STATE_VERIFY_FAILED -> {
+                    binding.getcode.visibility=View.VISIBLE
+                    binding.buttonphone.visibility=View.VISIBLE
+                    binding.buttonphone.visibility=View.VISIBLE
+                    binding.editTextPhone.visibility=View.VISIBLE
+                    binding.verificationno.visibility=View.VISIBLE
+                Log.i("response","status_verification_failed")
+            }
+            STATE_VERIFY_SUCCESS -> {
+                    binding.getcode.visibility=View.INVISIBLE
+                    binding.buttonphone.visibility=View.INVISIBLE
+                    binding.buttonphone.visibility=View.INVISIBLE
+                    binding.editTextPhone.visibility=View.INVISIBLE
+                    binding.verificationno.visibility=View.INVISIBLE
+                Log.i("response","status_verification_succeeded")
+                if (cred != null) {
+                    if (cred.smsCode != null) {
+                        binding.verificationno.setText(cred.smsCode)
+                    } else {
+                        Log.i("response","instant_validation")
+                    }
+                }
+            }
+            STATE_SIGNIN_FAILED ->
+                Log.i("response","status_sign_in_failed")
+
+            STATE_SIGNIN_SUCCESS -> {
+            }
+        }
+
+        if (user == null) {
+        } else {
+            val account = GoogleSignIn.getLastSignedInAccount(requireActivity())
+            val idToken= account?.idToken
+            //sending to the backend //
+
+            val phoneNumber = binding.editTextPhone.text.toString()
+            //add retrofit here
+            navController = view?.let { Navigation.findNavController(it) }
+            navController!!.navigate(R.id.action_phonenumber_to_titlefragment)
+        }
+    }
+
+    private fun validatePhoneNumber(): Boolean {
+        val phoneNumber = binding.editTextPhone.text.toString()
+        if (TextUtils.isEmpty(phoneNumber)) {
+            binding.editTextPhone.error = "Invalid phone number."
+            return false
+        }
+        return true
+    }
+
+    private fun enableViews(vararg views: View) {
+        for (v in views) {
+            v.isEnabled = true
+        }
+    }
+
+    private fun disableViews(vararg views: View) {
+        for (v in views) {
+            v.isEnabled = false
+        }
+    }
+
+    companion object {
+        private const val TAG = "PhoneAuthActivity"
+        private const val KEY_VERIFY_IN_PROGRESS = "key_verify_in_progress"
+        private const val STATE_INITIALIZED = 1
+        private const val STATE_VERIFY_FAILED = 3
+        private const val STATE_VERIFY_SUCCESS = 4
+        private const val STATE_CODE_SENT = 2
+        private const val STATE_SIGNIN_FAILED = 5
+        private const val STATE_SIGNIN_SUCCESS = 6
+    }
+
+
 }

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/titlefragment">
+    app:startDestination="@id/page53">
 
     <fragment
         android:id="@+id/titlefragment"
@@ -11,16 +11,7 @@
         android:label="fragment_titlefragment"
         tools:layout="@layout/fragment_titlefragment" >
         <action
-            android:id="@+id/action_titlefragment_to_page22"
-            app:destination="@id/page22" />
-    </fragment>
-    <fragment
-        android:id="@+id/page22"
-        android:name="com.example.kotlinpracrice.page2"
-        android:label="fragment_page2"
-        tools:layout="@layout/fragment_page2" >
-        <action
-            android:id="@+id/action_page22_to_page32"
+            android:id="@+id/action_titlefragment_to_page32"
             app:destination="@id/page32" />
     </fragment>
     <fragment
@@ -30,7 +21,10 @@
         tools:layout="@layout/fragment_page3" >
         <action
             android:id="@+id/action_page32_to_page42"
-            app:destination="@id/page42" />
+            app:destination="@id/page42"
+            app:enterAnim="@anim/slidein"
+            app:popUpTo="@id/titlefragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/page42"
@@ -38,11 +32,12 @@
         android:label="fragment_page4"
         tools:layout="@layout/fragment_page4" >
         <action
-            android:id="@+id/action_page42_to_page22"
-            app:destination="@id/page22" />
-        <action
             android:id="@+id/action_page42_to_titlefragment"
-            app:destination="@id/titlefragment" />
+            app:destination="@id/titlefragment"
+            app:enterAnim="@anim/slidein" />
+        <action
+            android:id="@+id/action_page42_to_page32"
+            app:destination="@id/page32" />
     </fragment>
     <fragment
         android:id="@+id/page53"
@@ -51,7 +46,11 @@
         tools:layout="@layout/fragment_page5" >
         <action
             android:id="@+id/action_page53_to_phonenumber"
-            app:destination="@id/phonenumber" />
+            app:destination="@id/phonenumber"
+            app:enterAnim="@anim/slidein"
+            app:exitAnim="@anim/slidein"
+            app:popEnterAnim="@anim/slidein"
+            app:popExitAnim="@anim/slidein" />
     </fragment>
     <fragment
         android:id="@+id/phonenumber"
@@ -60,6 +59,12 @@
         tools:layout="@layout/fragment_phonenumber" >
         <action
             android:id="@+id/action_phonenumber_to_titlefragment"
-            app:destination="@id/titlefragment" />
+            app:destination="@id/titlefragment"
+            app:enterAnim="@anim/slidein" />
     </fragment>
+    <fragment
+        android:id="@+id/about"
+        android:name="com.example.kotlinpracrice.about"
+        android:label="fragment_about"
+        tools:layout="@layout/fragment_about" />
 </navigation>
