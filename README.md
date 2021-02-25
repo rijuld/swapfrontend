@@ -1,12 +1,12 @@
 # swapfrontend
 
-Functionality:
+# Functionality
 
 User signs in with Google. 
 Allow access only to BITS email addresses. 
 Then take their phone numbers and verify via Firebase OTP phone number verification. 
 Authenticate the sign in with your backend server and connect the phone number to the same account.
-The feature set includes:
+# The feature set include:
 1) Adding a request (a user can add multiple),
  
 2) Viewing your requests, 
@@ -19,7 +19,7 @@ The feature set includes:
 
 6)Matching should be on a first request, first match basis. 
 
-When two users are matched:
+# When two users are matched:
 
 1)Both users are sent a notification from the backend and when the details are viewed, he is be able to see the other person’s name, email, and phone number.
 
@@ -30,7 +30,7 @@ When two users are matched:
 4)Both the users requests automatically gets deleted once they are matched 
 
 
-Tech stack:
+# Techstack
 The app is made on Kotlin and Jetpack libraries. 
 All network requests are made using Retrofit.
 The UI for the Android app must be built using ConstraintLayouts. 
