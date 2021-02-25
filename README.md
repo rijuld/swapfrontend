@@ -1,5 +1,7 @@
 # swapfrontend
 
+kotlin(prac(rice))=swap
+
 # Functionality
 
 User signs in with Google. 
