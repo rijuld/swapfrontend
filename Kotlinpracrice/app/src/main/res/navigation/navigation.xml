@@ -8,8 +8,8 @@
     <fragment
         android:id="@+id/titlefragment"
         android:name="com.example.kotlinpracrice.titlefragment"
-        android:label="fragment_titlefragment"
-        tools:layout="@layout/fragment_titlefragment" >
+        android:label="Home"
+        tools:layout="@layout/fragment_titlefragment">
         <action
             android:id="@+id/action_titlefragment_to_page32"
             app:destination="@id/page32" />
@@ -17,8 +17,8 @@
     <fragment
         android:id="@+id/page32"
         android:name="com.example.kotlinpracrice.page3"
-        android:label="fragment_page3"
-        tools:layout="@layout/fragment_page3" >
+        android:label="Course Swap Req"
+        tools:layout="@layout/fragment_page3">
         <action
             android:id="@+id/action_page32_to_page42"
             app:destination="@id/page42"
@@ -29,8 +29,8 @@
     <fragment
         android:id="@+id/page42"
         android:name="com.example.kotlinpracrice.page4"
-        android:label="fragment_page4"
-        tools:layout="@layout/fragment_page4" >
+        android:label="Swap List"
+        tools:layout="@layout/fragment_page4">
         <action
             android:id="@+id/action_page42_to_titlefragment"
             app:destination="@id/titlefragment"
@@ -42,8 +42,8 @@
     <fragment
         android:id="@+id/page53"
         android:name="com.example.kotlinpracrice.page5"
-        android:label="fragment_page5"
-        tools:layout="@layout/fragment_page5" >
+        android:label="Google Sign In"
+        tools:layout="@layout/fragment_page5">
         <action
             android:id="@+id/action_page53_to_phonenumber"
             app:destination="@id/phonenumber"
@@ -55,16 +55,28 @@
     <fragment
         android:id="@+id/phonenumber"
         android:name="com.example.kotlinpracrice.Phonenumber"
-        android:label="fragment_phonenumber"
-        tools:layout="@layout/fragment_phonenumber" >
+        android:label="Phone Number"
+        tools:layout="@layout/fragment_phonenumber">
         <action
-            android:id="@+id/action_phonenumber_to_titlefragment"
-            app:destination="@id/titlefragment"
-            app:enterAnim="@anim/slidein" />
+            android:id="@+id/action_phonenumber_to_intermediate"
+            app:destination="@id/intermediate" />
     </fragment>
     <fragment
         android:id="@+id/about"
         android:name="com.example.kotlinpracrice.about"
-        android:label="fragment_about"
+        android:label="About"
         tools:layout="@layout/fragment_about" />
+    <activity
+        android:id="@+id/blank"
+        android:name="com.example.kotlinpracrice.blank"
+        android:label="blank" />
+    <fragment
+        android:id="@+id/intermediate"
+        android:name="com.example.kotlinpracrice.intermediate"
+        android:label="Wait"
+        tools:layout="@layout/fragment_intermediate">
+        <action
+            android:id="@+id/action_intermediate_to_titlefragment"
+            app:destination="@id/titlefragment" />
+    </fragment>
 </navigation>

@@ -19,6 +19,7 @@ import com.example.kotlinpracrice.model.Post
 import com.example.kotlinpracrice.repository.Repository
 import com.example.kotlinpracrice.viewmodelfactory.page3viewmodelfactory
 import com.example.kotlinpracrice.viewmodels.page3viewmodel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 
 
 class page4 : Fragment(),MyAdapter.OnItemClickListener {
@@ -33,11 +34,13 @@ class page4 : Fragment(),MyAdapter.OnItemClickListener {
         val viewModelFactory=page3viewmodelfactory(repository)
         viewModel= ViewModelProviders.of(this,viewModelFactory).get(page3viewmodel::class.java)
 
-        viewModel.customPost(2,"id","desc")
-        viewModel.myCustomPosts.observe(this, Observer { response->
+        viewModel.customPost("errijuldahiya@gmail.com","id","desc")
+        viewModel.myCustomPosts.observe(viewLifecycleOwner, Observer { response->
             if(response.isSuccessful){
                 Log.d("Response",response.body().toString())
-                response.body()?.let { myAdapter.setData(it) }
+                val account = GoogleSignIn.getLastSignedInAccount(requireActivity())
+                val k= response.body()?.filter { a->a.user== account?.email  }
+                k?.let { myAdapter.setData(it) }
             }
             else{
                 Log.i("Response",response.errorBody().toString())
@@ -68,15 +71,12 @@ class page4 : Fragment(),MyAdapter.OnItemClickListener {
         val t=position.text.toString().trim().toInt()
         viewModel.deletePost(t)
         viewModel.deleteResponse.observe(this, Observer { response->
-
             if(response.isSuccessful){
                 Log.i("Response",response.body().toString())
             }
             else{
-                Log.i("Response",response.errorBody().toString())
+                Log.i("Responseerror",response.errorBody().toString())
             }
-
-
         })
     }
 

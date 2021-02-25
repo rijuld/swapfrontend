@@ -45,10 +45,10 @@ class page4viewmodel(private val repository: Repository) :ViewModel(){
 
         }
     }
-    fun customPost(id:Int,sort: String,order:String){
+    fun customPost(user: String,sort: String,order:String){
         Log.i("response","custom post")
         viewModelScope.launch {
-            val response =repository.getCustomPost(id,sort,order)
+            val response =repository.getCustomPost(user,sort,order)
             myCustomPosts.value=response
 
         }

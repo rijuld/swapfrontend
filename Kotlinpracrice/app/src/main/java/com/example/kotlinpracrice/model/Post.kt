@@ -16,5 +16,14 @@ data class User(
         val userid:String,
         val course:List<String>,
         val phonenumber: Phonenumber,
+)
+data class Usersend(
+    val idToken:String,
+    val phone_number: String,
+    val cloudToken:String
+
+)
+data class idt(
+        val phonenumber: String,
         val idToken: String
 )

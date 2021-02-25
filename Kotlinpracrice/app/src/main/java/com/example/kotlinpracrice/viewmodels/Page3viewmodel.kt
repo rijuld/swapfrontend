@@ -1,11 +1,14 @@
 package com.example.kotlinpracrice.viewmodels
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kotlinpracrice.model.Post
 import com.example.kotlinpracrice.model.User
+import com.example.kotlinpracrice.model.Usersend
+import com.example.kotlinpracrice.model.idt
 import com.example.kotlinpracrice.repository.Repository
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -16,7 +19,9 @@ class page3viewmodel(private val repository: Repository) :ViewModel(){
     val deleteResponse: MutableLiveData<Response<Post>> = MutableLiveData()
     val myCustomPosts: MutableLiveData<Response<List<Post>>> = MutableLiveData()
     val postPosts: MutableLiveData<Response<Post>> = MutableLiveData()
-    val userget: MutableLiveData<Response<String>> = MutableLiveData()
+    val use: MutableLiveData<Response<Usersend>> = MutableLiveData()
+    var cloudt: MutableLiveData<String> = MutableLiveData()
+
     init{
         Log.i("page3viewmodel","page3 view model created!")
     }
@@ -33,14 +38,7 @@ class page3viewmodel(private val repository: Repository) :ViewModel(){
 
         }
     }
-    fun deletePost(number: Int){
 
-        viewModelScope.launch {
-            val response =repository.deletePost(number)
-            deleteResponse.value=response
-
-        }
-    }
     fun getPost2(number:Int){
 
         viewModelScope.launch {
@@ -49,11 +47,19 @@ class page3viewmodel(private val repository: Repository) :ViewModel(){
 
         }
     }
-    fun customPost(id:Int,sort: String,order:String){
+    fun customPost(user:String,sort: String,order:String){
         Log.i("response","custom post")
         viewModelScope.launch {
-            val response =repository.getCustomPost(id,sort,order)
+            val response =repository.getCustomPost(user,sort,order)
+
             myCustomPosts.value=response
+
+        }
+    }
+    fun deletePost(number: Int){
+        viewModelScope.launch {
+            val response =repository.deletePost(number)
+            deleteResponse.value=response
 
         }
     }
@@ -64,11 +70,13 @@ class page3viewmodel(private val repository: Repository) :ViewModel(){
 
         }
     }
-    fun userpost(idToken: String,phone_number:String){
+    fun getUser(user:Usersend){
+
         viewModelScope.launch {
-            val response =repository.userPost(idToken,phone_number)
-            userget.value=response
+            val response =repository.getuser(user)
+            use.value=response
 
         }
     }
+
 }

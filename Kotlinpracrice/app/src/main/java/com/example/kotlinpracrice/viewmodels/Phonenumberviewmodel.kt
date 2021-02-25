@@ -18,12 +18,6 @@ class Phonenumberviewmodel(private val repository: Repository) :ViewModel(){
         super.onCleared()
         Log.i("Phonenumberviewmodel","Phonenumberviewmodel destroyed")
     }
-    fun userpost(idToken: String,phone_number:String){
-        viewModelScope.launch {
-            val response =repository.userPost(idToken,phone_number)
-            userget.value=response
 
-        }
-    }
 
 }

@@ -7,24 +7,29 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import com.example.kotlinpracrice.databinding.FragmentPhonenumberBinding
+import com.example.kotlinpracrice.model.Usersend
 import com.example.kotlinpracrice.repository.Repository
 import com.example.kotlinpracrice.viewmodelfactory.page3viewmodelfactory
 import com.example.kotlinpracrice.viewmodels.Phonenumberviewmodel
 import com.example.kotlinpracrice.viewmodels.page3viewmodel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import java.util.concurrent.TimeUnit
 private var navController: NavController? = null
 
@@ -64,10 +69,7 @@ class Phonenumber : Fragment() {
         callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                val account = GoogleSignIn.getLastSignedInAccount(requireActivity())
-                val idToken= account?.idToken
-                val phonenumber= auth.currentUser?.phoneNumber
-                viewModel.userpost(idToken.toString(),phonenumber.toString())
+
                 Log.d(TAG, "onVerificationCompleted:$credential")
                 verificationInProgress = false
                 updateUI(STATE_VERIFY_SUCCESS, credential)
@@ -204,6 +206,7 @@ class Phonenumber : Fragment() {
                 Log.i("response","status_verification_failed")
             }
             STATE_VERIFY_SUCCESS -> {
+
                     binding.getcode.visibility=View.INVISIBLE
                     binding.buttonphone.visibility=View.INVISIBLE
                     binding.buttonphone.visibility=View.INVISIBLE
@@ -227,14 +230,36 @@ class Phonenumber : Fragment() {
 
         if (user == null) {
         } else {
-            val account = GoogleSignIn.getLastSignedInAccount(requireActivity())
+            /*val account = GoogleSignIn.getLastSignedInAccount(requireActivity())
             val idToken= account?.idToken
-            //sending to the backend //
+            val phonenumber= auth.currentUser?.phoneNumber
+            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w("Token", "Fetching FCM registration token failed", task.exception)
+                    return@OnCompleteListener
+                }
+                val token = task.result
+                Log.d("TAG", token.toString())
+                Toast.makeText(requireContext(),token.toString(), Toast.LENGTH_SHORT).show()
+                val kk= Usersend(idToken.toString(),phonenumber.toString(),token.toString())
+                viewModel.getUser(kk)
+            })*/
 
+            /*viewModel.use.observe(viewLifecycleOwner, Observer { response->
+                if(response.isSuccessful){
+                    Log.i("Response",response.body().toString())
+                    navController = view?.let { Navigation.findNavController(it) }
+                    navController!!.navigate(R.id.action_phonenumber_to_intermediate)
+                }
+                else{
+                    Log.i("Responseerror",response.errorBody().toString())
+                }
+            })*/
+            navController = view?.let { Navigation.findNavController(it) }
+            navController!!.navigate(R.id.action_phonenumber_to_intermediate)
             val phoneNumber = binding.editTextPhone.text.toString()
             //add retrofit here
-            navController = view?.let { Navigation.findNavController(it) }
-            navController!!.navigate(R.id.action_phonenumber_to_titlefragment)
+
         }
     }
 
@@ -272,3 +297,4 @@ class Phonenumber : Fragment() {
 
 
 }
+

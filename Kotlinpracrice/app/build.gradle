@@ -55,6 +55,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-messaging-ktx'
+    implementation 'com.google.firebase:firebase-messaging:21.0.1'
     //google auth
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
     implementation("org.slf4j:slf4j-api:1.7.15")
@@ -73,12 +74,14 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     //somemore
     implementation 'com.android.support:support-annotations:28.0.0'
+    implementation 'androidx.wear:wear:1.1.0'
     //testing
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     //room
     implementation "androidx.room:room-runtime:2.2.6"
+    compileOnly 'com.google.android.wearable:wearable:2.8.1'
     kapt "androidx.room:room-compiler:2.2.6"
     implementation "androidx.room:room-ktx:2.2.6"
     // Kotlin Extensions and Coroutines support for Room
@@ -106,6 +109,7 @@ dependencies {
     // RecyclerView
     //add
     implementation "androidx.browser:browser:1.2.0"
+
 
 
 }

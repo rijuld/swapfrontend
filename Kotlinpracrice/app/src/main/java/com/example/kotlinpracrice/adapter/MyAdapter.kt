@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.row_layout.view.*
 class MyAdapter(private val listener: MyAdapter.OnItemClickListener) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
     private  var myList= emptyList<Post>()
+    var myListsize= myList.size
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
     View.OnClickListener{
         val deletea: ImageView=itemView.findViewById(R.id.delete)
@@ -28,6 +29,8 @@ class MyAdapter(private val listener: MyAdapter.OnItemClickListener) : RecyclerV
             val position :Int =adapterPosition
             if(position!=RecyclerView  .NO_POSITION)
             listener.onItemClick(cid,position)
+            itemView?.visibility=View.GONE
+
 
         }
     }

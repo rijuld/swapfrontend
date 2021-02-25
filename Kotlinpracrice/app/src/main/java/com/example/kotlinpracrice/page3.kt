@@ -15,6 +15,7 @@ import com.example.kotlinpracrice.model.Post
 import com.example.kotlinpracrice.repository.Repository
 import com.example.kotlinpracrice.viewmodelfactory.page3viewmodelfactory
 import com.example.kotlinpracrice.viewmodels.page3viewmodel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 
 class page3 : Fragment() {
     private lateinit var viewModel: page3viewmodel
@@ -29,7 +30,7 @@ class page3 : Fragment() {
         Log.d("Response","problem not here")
         viewModel= ViewModelProviders.of(this,viewModelFactory).get(page3viewmodel::class.java)
 
-        viewModel.customPost(2,"id","desc")
+        viewModel.customPost("errijuldahiya@gmail.com","id","desc")
         val hashMap:HashMap<String,Int> = HashMap<String,Int>()
         hashMap["HSS F325"] = 12
         hashMap["HSS F237"] = 5
@@ -41,7 +42,7 @@ class page3 : Fragment() {
         hashMap["HSS F322"] = 11
         hashMap["HSS F236"] = 4
 
-        viewModel.myCustomPosts.observe(this, Observer { response->
+        viewModel.myCustomPosts.observe(viewLifecycleOwner, Observer { response->
             if(response.isSuccessful){
                 Log.i("response",response.body().toString())
                response.body()?.forEach{
@@ -61,21 +62,22 @@ class page3 : Fragment() {
         })
         //parameters are the owner and the second view model factory
         binding.buttonpage3.setOnClickListener { view :View->
-            val have=binding.havetype.text.toString().trim()
-            val want=binding.wanttype.text.toString().trim()
-            val mypost= Post(0, have, want,"rijul2")
+            val have=binding.havetype.text.toString().toUpperCase().trim()
+            val want=binding.wanttype.text.toString().toUpperCase().trim()
+            val account = GoogleSignIn.getLastSignedInAccount(requireActivity())
+            val userid= account?.email.toString()
+            val mypost= Post(0, have, want,userid)
             Log.i("Responsehello",mypost.toString())
             viewModel.pushPost(mypost)
-            viewModel.postPosts.observe(this, Observer { response->
+            viewModel.postPosts.observe(viewLifecycleOwner, Observer { response->
                 if(response.isSuccessful){
                     Log.i("Responsefinal",response.body().toString())
-                    view.findNavController().navigate(page3Directions.actionPage32ToPage42())
                 }
                 else{
                     //Log.i("Responsefinal",response.errorBody().toString())
                     //view.findNavController().navigate(page3Directions.actionPage32ToPage42())
                 }
-
+                view.findNavController().navigate(page3Directions.actionPage32ToPage42())
 
             })
 

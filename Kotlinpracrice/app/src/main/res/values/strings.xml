@@ -3,8 +3,13 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="name">The swap app</string>
-    <string name="aa">The swap app</string>
+    <string name="NOTIFICATION_CHANNEL_ID">com.example.kotlinpracrice</string>
+    <string name="USER_EMAIL">uid1</string>
+    <string name="USER_PHONE">phno1</string>
+    <string name="USER_ASSIGNED">uid2</string>
+    <string name="USER_ASSIGNED_PHONE">phno2</string>
     <string name="what">what is your nickname</string>
+
     <string-array name="planets_array">
         <item>Mercury</item>
         <item>Venus</item>
@@ -15,4 +20,10 @@
         <item>Uranus</item>
         <item>Neptune</item>
     </string-array>
+    <string name="title_activity_blank">blank</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
 </resources>
