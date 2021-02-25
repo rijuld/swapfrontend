@@ -7,7 +7,7 @@ kotlin(prac(rice))=swap
 User signs in with Google. 
 Allow access only to BITS email addresses. 
 Then take their phone numbers and verify via Firebase OTP phone number verification. 
-Authenticate the sign in with your backend server and connect the phone number to the same account.
+Authenticates the sign in with my backend server and connect the phone number to the same account.
 # The feature set include:
 1) Adding a request (a user can add multiple),
  
