@@ -1,6 +1,16 @@
-# swapfrontend
+# swap-backend
 
-kotlin(prac(rice))=swap
+You can access the rest service api using
+
+https://swapcrux.herokuapp.com/
+
+# swap-backend-repo
+
+You can access the repo here
+
+https://github.com/rijuld/swap-backend
+
+
 
 # Functionality
 
